@@ -38,14 +38,14 @@
  */
 function middmedia_filter($courseid, $text) {
     global $CFG;
-    if (empty($CFG->middmedia_protocol))
-        $CFG->middmedia_protocol = 'http';
-    if (empty($CFG->middmedia_host))
-        $CFG->middmedia_host = 'middmedia.middlebury.edu';
-    if (empty($CFG->middmedia_base_path))
-        $CFG->middmedia_base_path = '/media/';
+    if (empty($CFG->filter_middmedia_protocol))
+        $CFG->filter_middmedia_protocol = 'http';
+    if (empty($CFG->filter_middmedia_host))
+        $CFG->filter_middmedia_host = 'middmedia.middlebury.edu';
+    if (empty($CFG->filter_middmedia_base_path))
+        $CFG->filter_middmedia_base_path = '/media/';
     
-    $media_base = $CFG->middmedia_protocol.'://'.$CFG->middmedia_host.$CFG->middmedia_base_path;
+    $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
     $media_base = str_replace('/', '\/', $media_base);
     
     // Replace audio
@@ -67,7 +67,7 @@ function middmedia_filter($courseid, $text) {
  */
 function middmedia_filter_audio_callback ($matches) {
     global $CFG;
-    $media_base = $CFG->middmedia_protocol.'://'.$CFG->middmedia_host.$CFG->middmedia_base_path;
+    $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
     
     $path = middmedia_filter_get_path_parts($matches[1]);
     $mp3 = $media_base.$path['directory'].'/mp3/'.$path['file'].'.mp3';
@@ -93,8 +93,8 @@ function middmedia_filter_audio_callback ($matches) {
  */
 function middmedia_filter_video_callback ($matches) {
     global $CFG;
-    $media_base = $CFG->middmedia_protocol.'://'.$CFG->middmedia_host.$CFG->middmedia_base_path;
-    $supports_rtmp = !empty($CFG->middmedia_supports_rtmp);    
+    $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
+    $supports_rtmp = !empty($CFG->filter_middmedia_supports_rtmp);    
     
     if (empty($matches[2]))
         $width = 640;
@@ -110,10 +110,13 @@ function middmedia_filter_video_callback ($matches) {
     $poster = $media_base.$path['directory'].'/splash/'.$path['file'].'.jpg';
     $mp4 = $media_base.$path['directory'].'/mp4/'.$path['file'].'.mp4';
     $webm = $media_base.$path['directory'].'/webm/'.$path['file'].'.webm';
-    if ($supports_rtmp)
-        $stream = 'rtmp://'.$CFG->middmedia_host.'/vod/mp4:'.$path['directory'].'/mp4/'.$path['file'].'.mp4';
-    else
+    if ($supports_rtmp) {
+        if (empty($CFG->filter_middmedia_rtmp_base_path))
+            $CFG->filter_middmedia_rtmp_base_path = '/vod/';
+        $stream = 'rtmp://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_rtmp_base_path.'mp4:'.$path['directory'].'/mp4/'.$path['file'].'.mp4';
+    } else {
         $stream = $mp4;
+    }
     
     ob_start();
     print "\n".'<video width="'.$width.'" height="'.$height.'" poster="'.$poster.'" controls>';
