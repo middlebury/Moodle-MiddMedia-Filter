@@ -119,10 +119,12 @@ function middmedia_filter_video_callback ($matches) {
     }
     
     ob_start();
-    print "\n".'<video width="'.$width.'" height="'.$height.'" poster="'.$poster.'" controls>';
-    print "\n\t".'<source src="'.$mp4.'" type="video/mp4" />';
-    print "\n\t".'<source src="'.$webm.'" type="video/webm" />';
-    
+    $use_html5 = middmedia_filter_use_html5_video();
+    if ($use_html5) {
+        print "\n".'<video width="'.$width.'" height="'.$height.'" poster="'.$poster.'" controls>';
+        print "\n\t".'<source src="'.$mp4.'" type="video/mp4" />';
+        print "\n\t".'<source src="'.$webm.'" type="video/webm" />';
+    }
     print "\n\t".'<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="'.$width.'" height="'.$height.'">';
     print "\n\t\t".'<param name="movie" value="http://middmedia.middlebury.edu/strobe_mp/StrobeMediaPlayback.swf"></param>';
     print "\n\t\t".'<param name="FlashVars" value="src='.$stream.'&poster='.rawurlencode($poster).'"></param>';
@@ -131,8 +133,9 @@ function middmedia_filter_video_callback ($matches) {
     print "\n\t\t".'<embed src="http://middmedia.middlebury.edu/strobe_mp/StrobeMediaPlayback.swf" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="400" height="300" FlashVars="src='.$stream.'&poster='.rawurlencode($poster).'">';
     print '</embed>';
     print "\n\t".'</object>';
-    
-    print "\n</video>\n";
+    if ($use_html5) {
+        print "\n</video>\n";
+    }
 	return ob_get_clean();
 }
 
@@ -149,4 +152,21 @@ function middmedia_filter_get_path_parts ($path) {
 	$parts['type_subdir'] = basename($info['dirname']);
 	$parts['file'] = $info['filename'];
 	return $parts;
+}
+
+/**
+ * Answer true if HTML 5 markup can be used for video.
+ * HTML5 markup will break on Firefox < 4 because we only have MP4 and WebM video
+ * and not Ogg video.
+ * 
+ * @return boolean
+ */
+function middmedia_filter_use_html5_video () {
+    // If Firefox.
+    if (check_browser_version("Firefox", 0)) {
+        // only use HTML5 elements for 4 and later.
+    	return check_browser_version('Firefox', 4);
+    }
+    // HTML5 is safe for other browsers.
+    return true;
 }
