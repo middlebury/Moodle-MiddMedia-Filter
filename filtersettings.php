@@ -5,3 +5,4 @@ $settings->add(new admin_setting_configtext('filter_middmedia_host', get_string(
 $settings->add(new admin_setting_configtext('filter_middmedia_base_path', get_string('base_path_title','filter_middmedia'), get_string('base_path_desc', 'filter_middmedia'), '/media/'));
 $settings->add(new admin_setting_configcheckbox('filter_middmedia_supports_rtmp', get_string('supports_rtmp_title','filter_middmedia'), get_string('supports_rtmp_desc', 'filter_middmedia'), 1));
 $settings->add(new admin_setting_configtext('filter_middmedia_rtmp_base_path', get_string('rtmp_path_title','filter_middmedia'), get_string('rtmp_path_desc', 'filter_middmedia'), '/vod/'));
+$settings->add(new admin_setting_configtext('filter_middmedia_audio_player_path', get_string('audio_path_title','filter_middmedia'), get_string('audio_path_desc', 'filter_middmedia'), 'http://middmedia.middlebury.edu/AudioPlayer/'));

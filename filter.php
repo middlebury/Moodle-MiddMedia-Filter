@@ -73,14 +73,17 @@ function middmedia_filter_audio_callback ($matches) {
     $mp3 = $media_base.$path['directory'].'/mp3/'.$path['file'].'.mp3';
     $id = preg_replace('/[^a-z0-9]/', '_', $mp3);
     
+    if (empty($CFG->filter_middmedia_audio_player_path))
+        $CFG->filter_middmedia_audio_player_path = 'http://middmedia.middlebury.edu/AudioPlayer/';
+    
     ob_start();
     static $js_included = false;
     if (!$js_included) {
-        print "\n".'<script type="text/javascript" src="http://middmedia.middlebury.edu/AudioPlayer/audio-player.js"></script>';
+        print "\n".'<script type="text/javascript" src="'.$CFG->filter_middmedia_audio_player_path.'audio-player.js"></script>';
         $js_included = true;
     }
-    print "\n".'<object width="290" height="24" id="'.$id.'" data="http://middmedia.middlebury.edu/AudioPlayer/player.swf" type="application/x-shockwave-flash">';
-    print "\n\t".'<param value="http://middmedia.middlebury.edu/AudioPlayer/player.swf" name="movie" />';
+    print "\n".'<object width="290" height="24" id="'.$id.'" data="'.$CFG->filter_middmedia_audio_player_path.'player.swf" type="application/x-shockwave-flash">';
+    print "\n\t".'<param value="'.$CFG->filter_middmedia_audio_player_path.'player.swf" name="movie" />';
     print "\n\t".'<param value="high" name="quality" />';
     print "\n\t".'<param value="false" name="menu" />';
     print "\n\t".'<param value="transparent" name="wmode" />';

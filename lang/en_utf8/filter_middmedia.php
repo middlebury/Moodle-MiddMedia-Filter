@@ -16,3 +16,6 @@ $string['supports_rtmp_desc'] = 'If true, the flash player will be configured to
 
 $string['rtmp_path_title'] = 'RTMP Base Path';
 $string['rtmp_path_desc'] = 'The base path for media when streaming via RTMP. Include leading and trailing slashes.';
+
+$string['audio_path_title'] = 'Audio Player path';
+$string['audio_path_desc'] = 'The url where the Audio_Player javascript and swf can be found. Include leading and trailing slashes.';
