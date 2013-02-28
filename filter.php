@@ -56,6 +56,12 @@ function middmedia_filter($courseid, $text) {
     $search = '/<a[^>]* href="'.$media_base.'([^"<?]+)(\?d=([\d]{1,4}%?)x([\d]{1,4}%?))?"[^>]*>[^<]*<\/a>/is';
     $text = preg_replace_callback($search, 'middmedia_filter_video_callback', $text);
     
+    // Ensure that links to our "view" page don't get picked up by the built-in media filter
+    $view_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.'/middmedia/view/';
+    $view_base = str_replace('/', '\/', $view_base);
+    $search = '/(<a[^>]* href=")('.$view_base.'[^"<?]+[^\/])("[^>]*>[^<]*<\/a>)/is';
+    $text = preg_replace_callback($search, 'middmedia_filter_view_callback', $text);
+    
     return $text;
 }
 
@@ -144,6 +150,16 @@ function middmedia_filter_video_callback ($matches) {
         print "\n</video>\n";
     }
 	return ob_get_clean();
+}
+
+/**
+ * Tweak middmedia view links so that the built-in media plugin doesn't try to turn them into embed code.
+ * 
+ * @param array $matches
+ * @return string
+ */
+function middmedia_filter_view_callback ($matches) {
+    return $matches[1].$matches[2].'/'.$matches[3];
 }
 
 /**
