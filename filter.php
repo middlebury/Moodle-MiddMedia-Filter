@@ -50,15 +50,15 @@ function middmedia_filter($courseid, $text) {
     $mediabase = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
     $mediabase = str_replace('/', '\/', $mediabase);
 
-    // Replace audio
+    // Replace audio.
     $search = '/<a[^>]* href="'.$mediabase.'([^"<?]+\.mp3)"[^>]*>[^<]*<\/a>/is';
     $text = preg_replace_callback($search, 'middmedia_filter_audio_callback', $text);
 
-    // Replace videos
+    // Replace videos.
     $search = '/<a[^>]* href="'.$mediabase.'([^"<?]+)(\?d=([\d]{1,4}%?)x([\d]{1,4}%?))?"[^>]*>[^<]*<\/a>/is';
     $text = preg_replace_callback($search, 'middmedia_filter_video_callback', $text);
 
-    // Ensure that links to our "view" page don't get picked up by the built-in media filter
+    // Ensure that links to our "view" page don't get picked up by the built-in media filter.
     $viewbase = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.'/middmedia/view/';
     $viewbase = str_replace('/', '\/', $viewbase);
     $search = '/(<a[^>]* href=")('.$viewbase.'[^"<?]+[^\/])("[^>]*>[^<]*<\/a>)/is';
