@@ -37,12 +37,15 @@
  */
 function middmedia_filter($courseid, $text) {
     global $CFG;
-    if (empty($CFG->filter_middmedia_protocol))
+    if (empty($CFG->filter_middmedia_protocol)) {
         $CFG->filter_middmedia_protocol = 'http';
-    if (empty($CFG->filter_middmedia_host))
+    }
+    if (empty($CFG->filter_middmedia_host)) {
         $CFG->filter_middmedia_host = 'middmedia.middlebury.edu';
-    if (empty($CFG->filter_middmedia_base_path))
+    }
+    if (empty($CFG->filter_middmedia_base_path)) {
         $CFG->filter_middmedia_base_path = '/media/';
+    }
 
     $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
     $media_base = str_replace('/', '\/', $media_base);
@@ -78,8 +81,9 @@ function middmedia_filter_audio_callback ($matches) {
     $mp3 = $media_base.$path['directory'].'/mp3/'.$path['file'].'.mp3';
     $id = preg_replace('/[^a-z0-9]/', '_', $mp3);
 
-    if (empty($CFG->filter_middmedia_audio_player_path))
+    if (empty($CFG->filter_middmedia_audio_player_path)) {
         $CFG->filter_middmedia_audio_player_path = 'http://middmedia.middlebury.edu/AudioPlayer/';
+    }
 
     ob_start();
     static $js_included = false;
@@ -108,14 +112,16 @@ function middmedia_filter_video_callback ($matches) {
     $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
     $supports_rtmp = !empty($CFG->filter_middmedia_supports_rtmp);
 
-    if (empty($matches[2]))
+    if (empty($matches[2])) {
         $width = 640;
-    else
+    } else {
         $width = $matches[2];
-    if (empty($matches[3]))
+    }
+    if (empty($matches[3])) {
         $height = 480;
-    else
+    } else {
         $height = $matches[3];
+    }
 
     $path = middmedia_filter_get_path_parts($matches[1]);
 
@@ -123,8 +129,9 @@ function middmedia_filter_video_callback ($matches) {
     $mp4 = $media_base.$path['directory'].'/mp4/'.$path['file'].'.mp4';
     $webm = $media_base.$path['directory'].'/webm/'.$path['file'].'.webm';
     if ($supports_rtmp) {
-        if (empty($CFG->filter_middmedia_rtmp_base_path))
+        if (empty($CFG->filter_middmedia_rtmp_base_path)) {
             $CFG->filter_middmedia_rtmp_base_path = '/vod/';
+        }
         $stream = 'rtmp://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_rtmp_base_path.'mp4:'.$path['directory'].'/mp4/'.$path['file'].'.mp4';
     } else {
         $stream = $mp4;
