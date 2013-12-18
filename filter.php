@@ -193,7 +193,7 @@ function middmedia_filter_get_path_parts ($path) {
 function middmedia_filter_use_html5_video () {
     // If Firefox.
     if (check_browser_version("Firefox", 0)) {
-        // only use HTML5 elements for 4 and later.
+        // Only use HTML5 elements for 4 and later.
         return check_browser_version('Firefox', 4);
     }
     // HTML5 is safe for other browsers.
