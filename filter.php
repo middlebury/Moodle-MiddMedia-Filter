@@ -13,14 +13,13 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
- 
+
 /**
  * Filter for embedding audio and video hosted in MiddMedia.
  *
- * MiddMedia ( https://github.com/middlebury/middmedia ) is a web-based 
- * file-management tool that allows users to upload, delete, preview, and get 
- * embed code for media files. MiddMedia is designed to work along-side Adobe's 
+ * MiddMedia ( https://github.com/middlebury/middmedia ) is a web-based
+ * file-management tool that allows users to upload, delete, preview, and get
+ * embed code for media files. MiddMedia is designed to work along-side Adobe's
  * Flash Media Server (FMS) to handle media management duties.
  *
  * @package    filter
@@ -31,7 +30,7 @@
 
 /**
  * Filter hook.
- * 
+ *
  * @param int       $courseid
  * @param string    $text
  * @return string
@@ -44,44 +43,44 @@ function middmedia_filter($courseid, $text) {
         $CFG->filter_middmedia_host = 'middmedia.middlebury.edu';
     if (empty($CFG->filter_middmedia_base_path))
         $CFG->filter_middmedia_base_path = '/media/';
-    
+
     $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
     $media_base = str_replace('/', '\/', $media_base);
-    
+
     // Replace audio
     $search = '/<a[^>]* href="'.$media_base.'([^"<?]+\.mp3)"[^>]*>[^<]*<\/a>/is';
     $text = preg_replace_callback($search, 'middmedia_filter_audio_callback', $text);
-        
+
     // Replace videos
     $search = '/<a[^>]* href="'.$media_base.'([^"<?]+)(\?d=([\d]{1,4}%?)x([\d]{1,4}%?))?"[^>]*>[^<]*<\/a>/is';
     $text = preg_replace_callback($search, 'middmedia_filter_video_callback', $text);
-    
+
     // Ensure that links to our "view" page don't get picked up by the built-in media filter
     $view_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.'/middmedia/view/';
     $view_base = str_replace('/', '\/', $view_base);
     $search = '/(<a[^>]* href=")('.$view_base.'[^"<?]+[^\/])("[^>]*>[^<]*<\/a>)/is';
     $text = preg_replace_callback($search, 'middmedia_filter_view_callback', $text);
-    
+
     return $text;
 }
 
 /**
  * Replace middmedia audio links with embed code.
- * 
+ *
  * @param array $matches
  * @return string
  */
 function middmedia_filter_audio_callback ($matches) {
     global $CFG;
     $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
-    
+
     $path = middmedia_filter_get_path_parts($matches[1]);
     $mp3 = $media_base.$path['directory'].'/mp3/'.$path['file'].'.mp3';
     $id = preg_replace('/[^a-z0-9]/', '_', $mp3);
-    
+
     if (empty($CFG->filter_middmedia_audio_player_path))
         $CFG->filter_middmedia_audio_player_path = 'http://middmedia.middlebury.edu/AudioPlayer/';
-    
+
     ob_start();
     static $js_included = false;
     if (!$js_included) {
@@ -95,20 +94,20 @@ function middmedia_filter_audio_callback ($matches) {
     print "\n\t".'<param value="transparent" name="wmode" />';
     print "\n\t".'<param value="soundFile='.$mp3.'" name="FlashVars" />';
     print "\n</object>\n";
-	return ob_get_clean();
+    return ob_get_clean();
 }
 
 /**
  * Replace middmedia video links with embed code.
- * 
+ *
  * @param array $matches
  * @return string
  */
 function middmedia_filter_video_callback ($matches) {
     global $CFG;
     $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
-    $supports_rtmp = !empty($CFG->filter_middmedia_supports_rtmp);    
-    
+    $supports_rtmp = !empty($CFG->filter_middmedia_supports_rtmp);
+
     if (empty($matches[2]))
         $width = 640;
     else
@@ -117,9 +116,9 @@ function middmedia_filter_video_callback ($matches) {
         $height = 480;
     else
         $height = $matches[3];
-    
+
     $path = middmedia_filter_get_path_parts($matches[1]);
-    
+
     $poster = $media_base.$path['directory'].'/splash/'.$path['file'].'.jpg';
     $mp4 = $media_base.$path['directory'].'/mp4/'.$path['file'].'.mp4';
     $webm = $media_base.$path['directory'].'/webm/'.$path['file'].'.webm';
@@ -130,7 +129,7 @@ function middmedia_filter_video_callback ($matches) {
     } else {
         $stream = $mp4;
     }
-    
+
     ob_start();
     $use_html5 = middmedia_filter_use_html5_video();
     if ($use_html5) {
@@ -149,12 +148,12 @@ function middmedia_filter_video_callback ($matches) {
     if ($use_html5) {
         print "\n</video>\n";
     }
-	return ob_get_clean();
+    return ob_get_clean();
 }
 
 /**
  * Tweak middmedia view links so that the built-in media plugin doesn't try to turn them into embed code.
- * 
+ *
  * @param array $matches
  * @return string
  */
@@ -164,31 +163,31 @@ function middmedia_filter_view_callback ($matches) {
 
 /**
  * Answer an array of path info parts for middmedia paths.
- * 
+ *
  * @param string $path
  * @return array
  */
 function middmedia_filter_get_path_parts ($path) {
-	$parts = array();
-	$info = pathinfo($path);
-	$parts['directory'] = dirname($info['dirname']);
-	$parts['type_subdir'] = basename($info['dirname']);
-	$parts['file'] = $info['filename'];
-	return $parts;
+    $parts = array();
+    $info = pathinfo($path);
+    $parts['directory'] = dirname($info['dirname']);
+    $parts['type_subdir'] = basename($info['dirname']);
+    $parts['file'] = $info['filename'];
+    return $parts;
 }
 
 /**
  * Answer true if HTML 5 markup can be used for video.
  * HTML5 markup will break on Firefox < 4 because we only have MP4 and WebM video
  * and not Ogg video.
- * 
+ *
  * @return boolean
  */
 function middmedia_filter_use_html5_video () {
     // If Firefox.
     if (check_browser_version("Firefox", 0)) {
         // only use HTML5 elements for 4 and later.
-    	return check_browser_version('Firefox', 4);
+        return check_browser_version('Firefox', 4);
     }
     // HTML5 is safe for other browsers.
     return true;
