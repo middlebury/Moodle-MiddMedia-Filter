@@ -47,21 +47,21 @@ function middmedia_filter($courseid, $text) {
         $CFG->filter_middmedia_base_path = '/media/';
     }
 
-    $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
-    $media_base = str_replace('/', '\/', $media_base);
+    $mediabase = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
+    $mediabase = str_replace('/', '\/', $mediabase);
 
     // Replace audio
-    $search = '/<a[^>]* href="'.$media_base.'([^"<?]+\.mp3)"[^>]*>[^<]*<\/a>/is';
+    $search = '/<a[^>]* href="'.$mediabase.'([^"<?]+\.mp3)"[^>]*>[^<]*<\/a>/is';
     $text = preg_replace_callback($search, 'middmedia_filter_audio_callback', $text);
 
     // Replace videos
-    $search = '/<a[^>]* href="'.$media_base.'([^"<?]+)(\?d=([\d]{1,4}%?)x([\d]{1,4}%?))?"[^>]*>[^<]*<\/a>/is';
+    $search = '/<a[^>]* href="'.$mediabase.'([^"<?]+)(\?d=([\d]{1,4}%?)x([\d]{1,4}%?))?"[^>]*>[^<]*<\/a>/is';
     $text = preg_replace_callback($search, 'middmedia_filter_video_callback', $text);
 
     // Ensure that links to our "view" page don't get picked up by the built-in media filter
-    $view_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.'/middmedia/view/';
-    $view_base = str_replace('/', '\/', $view_base);
-    $search = '/(<a[^>]* href=")('.$view_base.'[^"<?]+[^\/])("[^>]*>[^<]*<\/a>)/is';
+    $viewbase = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.'/middmedia/view/';
+    $viewbase = str_replace('/', '\/', $viewbase);
+    $search = '/(<a[^>]* href=")('.$viewbase.'[^"<?]+[^\/])("[^>]*>[^<]*<\/a>)/is';
     $text = preg_replace_callback($search, 'middmedia_filter_view_callback', $text);
 
     return $text;
@@ -75,10 +75,10 @@ function middmedia_filter($courseid, $text) {
  */
 function middmedia_filter_audio_callback ($matches) {
     global $CFG;
-    $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
+    $mediabase = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
 
     $path = middmedia_filter_get_path_parts($matches[1]);
-    $mp3 = $media_base.$path['directory'].'/mp3/'.$path['file'].'.mp3';
+    $mp3 = $mediabase.$path['directory'].'/mp3/'.$path['file'].'.mp3';
     $id = preg_replace('/[^a-z0-9]/', '_', $mp3);
 
     if (empty($CFG->filter_middmedia_audio_player_path)) {
@@ -86,10 +86,10 @@ function middmedia_filter_audio_callback ($matches) {
     }
 
     ob_start();
-    static $js_included = false;
-    if (!$js_included) {
+    static $jsincluded = false;
+    if (!$jsincluded) {
         print "\n".'<script type="text/javascript" src="'.$CFG->filter_middmedia_audio_player_path.'audio-player.js"></script>';
-        $js_included = true;
+        $jsincluded = true;
     }
     print "\n".'<object width="290" height="24" id="'.$id.'" data="'.$CFG->filter_middmedia_audio_player_path.'player.swf" type="application/x-shockwave-flash">';
     print "\n\t".'<param value="'.$CFG->filter_middmedia_audio_player_path.'player.swf" name="movie" />';
@@ -109,8 +109,8 @@ function middmedia_filter_audio_callback ($matches) {
  */
 function middmedia_filter_video_callback ($matches) {
     global $CFG;
-    $media_base = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
-    $supports_rtmp = !empty($CFG->filter_middmedia_supports_rtmp);
+    $mediabase = $CFG->filter_middmedia_protocol.'://'.$CFG->filter_middmedia_host.$CFG->filter_middmedia_base_path;
+    $supportsrtmp = !empty($CFG->filter_middmedia_supports_rtmp);
 
     if (empty($matches[2])) {
         $width = 640;
@@ -125,10 +125,10 @@ function middmedia_filter_video_callback ($matches) {
 
     $path = middmedia_filter_get_path_parts($matches[1]);
 
-    $poster = $media_base.$path['directory'].'/splash/'.$path['file'].'.jpg';
-    $mp4 = $media_base.$path['directory'].'/mp4/'.$path['file'].'.mp4';
-    $webm = $media_base.$path['directory'].'/webm/'.$path['file'].'.webm';
-    if ($supports_rtmp) {
+    $poster = $mediabase.$path['directory'].'/splash/'.$path['file'].'.jpg';
+    $mp4 = $mediabase.$path['directory'].'/mp4/'.$path['file'].'.mp4';
+    $webm = $mediabase.$path['directory'].'/webm/'.$path['file'].'.webm';
+    if ($supportsrtmp) {
         if (empty($CFG->filter_middmedia_rtmp_base_path)) {
             $CFG->filter_middmedia_rtmp_base_path = '/vod/';
         }
@@ -138,8 +138,8 @@ function middmedia_filter_video_callback ($matches) {
     }
 
     ob_start();
-    $use_html5 = middmedia_filter_use_html5_video();
-    if ($use_html5) {
+    $html5 = middmedia_filter_use_html5_video();
+    if ($html5) {
         print "\n".'<video width="'.$width.'" height="'.$height.'" poster="'.$poster.'" controls>';
         print "\n\t".'<source src="'.$mp4.'" type="video/mp4" />';
         print "\n\t".'<source src="'.$webm.'" type="video/webm" />';
@@ -152,7 +152,7 @@ function middmedia_filter_video_callback ($matches) {
     print "\n\t\t".'<embed src="http://middmedia.middlebury.edu/strobe_mp/StrobeMediaPlayback.swf" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="400" height="300" FlashVars="src='.$stream.'&poster='.rawurlencode($poster).'">';
     print '</embed>';
     print "\n\t".'</object>';
-    if ($use_html5) {
+    if ($html5) {
         print "\n</video>\n";
     }
     return ob_get_clean();
